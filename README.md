@@ -1,6 +1,7 @@
-:img: https://raw.githubusercontent.com/JMHReif/marvel-api-import/images
+:readme:
+:img: https://raw.githubusercontent.com/JMHReif/marvel-api-import/master/images
 
-# marvel-api-import
+= marvel-api-import
 
 "Data provided by Marvel. © 2014 Marvel"
 
@@ -11,7 +12,7 @@ I want to use this data for analysis to find the connections and relationships b
 Retrieval of this data requires proper attribution for use, and it requires an individual API key that is granted via access request and a user account.
 Steps for this process are included below.
 
-## Requesting an API key
+== Requesting an API key
 
 Users interested in following this process for themselves and pulling the data into JSON files can do so with the following steps:
 
@@ -25,11 +26,13 @@ You can go to the `My Developer Account` option in the `Developer Portal` menu a
 Be sure to think and plan carefully how to retrieve the data based on result limits and rate limits!
 This is very tricky.
 
-## Entity amounts
+== Entity amounts
 
 Current existing entity counts from the API are listed here to help others plan retrieval and limits:
 
+[opts=header]
 |===
+h|Entity       |   Count|
 |*Characters:* |   1493 |
 |*Comics:*     |  46410 |
 |*Creators:*   |   5304 |
