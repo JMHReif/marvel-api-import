@@ -1,3 +1,5 @@
+#"Data provided by Marvel. © 2020 MARVEL"
+
 # import dependency packages
 import sys
 import hashlib
@@ -9,7 +11,7 @@ from datetime import datetime
 import json
 
 #variables
-url_prefix = 'http://gateway.marvel.com/'
+url_prefix = 'https://gateway.marvel.com:443/'
 TWENTYFOUR_HOURS = 86400
 callCount = 0
 skipVal = 0
@@ -45,11 +47,11 @@ def retrieve_characters():
     print("Total characters: ", totalCharacters)
     callsNeeded = int(math.ceil(totalCharacters / 100))
     trimmedData = {
-            "results": []
+            "characters": []
     }
 
     print("Adding character data to file...")
-    for num in range(1,callsNeeded):
+    for num in range(callsNeeded):
         url = url_char_suffix + str(skipVal)
         data = call_marvel_api(url)
 
@@ -84,114 +86,108 @@ def read_character_file(entity):
 
         for character in fileData['results']:
             charId = character['id']
-
-            if entity == 'comics':
-                entity_url = character['comics']['collectionURI']
-                num_available = character['comics']['available']
-                #print("Total comics for character: ", num_available)
-            elif entity == 'events':
-                entity_url = character['events']['collectionURI']
-                num_available = character['events']['available']
-                print("Total events for character: ", num_available)
-            elif entity == 'series':
-                entity_url = character['series']['collectionURI']
-                num_available = character['series']['available']
-                print("Total series for character: ", num_available)
-            elif entity == 'stories':
-                entity_url = character['stories']['collectionURI']
-                num_available = character['stories']['available']
-                print("Total stories for character: ", num_available)
-            else:
-                print('Entity does not exist!')
+            entity_url = character[entity]['collectionURI']
+            num_available = character[entity]['available']
             
-            callsNeeded = int(math.ceil(num_available / 100))
-            print("CharId: ", charId, " Calls needed: ", callsNeeded)
+            if num_available > 0:
+                callsNeeded = int(math.ceil(num_available / 100))
+                #print("CharId: ", charId, " Calls needed: ", callsNeeded)
 
-            details = {
-                "characterId": charId,
-                "entity": entity,
-                "entity_url": entity_url,
-                "num_available": num_available,
-                "callsNeeded": callsNeeded
-            }
-            jsonObject['results'].append(details)
+                details = {
+                    "characterId": charId,
+                    "entity": entity,
+                    "entity_url": entity_url,
+                    "num_available": num_available,
+                    "callsNeeded": callsNeeded
+                }
+                jsonObject['results'].append(details)
     
     return jsonObject
 
 def retrieve_comics():
     global url_prefix, callCount, skipVal
-    url_comic_params = '?orderBy=title&limit=100&offset='
+    url_comic = url_prefix + 'v1/public/characters/'
+    url_suffix = '/comics?orderBy=title&limit=100&offset='
 
     charData = read_character_file('comics')
-    trimmedData = {
-        "results": []
-    }
 
+    characterNum = 0
     for character in charData['results']:
-        callsNeeded = character['callsNeeded']
-        if callsNeeded > 0:
-            callCount = callCount + int(callsNeeded)
-            if callCount < 3000:
-                print("Adding comic data to file...")
-                for num in range(1,callsNeeded):
-                    url = character['entity_url'] + url_comic_params + str(skipVal)
+        skipVal = 0
+        trimmedData = {
+            "characterId": character['characterId'],
+            "comicNumber": character['num_available'],
+            "comics": []
+        }
+        callsNeeded = int(character['callsNeeded'])
+        callCount = callCount + int(callsNeeded)
 
-                    data = call_marvel_api(url)
-                    comics = data['results']
+        if callCount < 3000:
+            #print("Adding comic data to file...")
+            for num in range(callsNeeded):
+                url = url_comic + str(character['characterId']) + url_suffix + str(skipVal)
 
-                    #trim unwanted data
-                    for element in comics: 
-                        del element['creators']['items']
-                        del element['creators']['returned']
-                        del element['characters']['items']
-                        del element['characters']['returned']
-                        del element['stories']['items']
-                        del element['stories']['returned']
-                        del element['events']['items']
-                        del element['events']['returned']
-                        trimmedData['results'].append(element)
+                data = call_marvel_api(url)
+                comics = data['results']
 
-                    #increment skip value
-                    skipVal = skipVal + 100
+                #trim unwanted data
+                for element in comics: 
+                    del element['textObjects']
+                    del element['creators']['items']
+                    del element['creators']['returned']
+                    del element['characters']['items']
+                    del element['characters']['returned']
+                    del element['stories']['items']
+                    del element['stories']['returned']
+                    del element['events']['items']
+                    del element['events']['returned']
+                    trimmedData['comics'].append(element)
 
-                with open('comics.json', 'a') as comicsFile:
-                    json.dump(trimmedData, comicsFile, indent=4)
-                    #comicsFile.write("\n")
+                #increment skip value
+                skipVal = skipVal + 100
+
+            with open('comics.json', 'a') as comicsFile:
+                json.dump(trimmedData, comicsFile, indent=4)
+                comicsFile.write("\n")
         
-                print('Calls needed: ', callsNeeded, ' Call count: ', callCount)
-            else:
-                print("PAUSE! Halting processing to avoid call limit overage")
-                print("Left off with character: ", character['id'], ' - ', character['name'])
-                sys.exit(0)
+            print('Calls needed: ', callsNeeded, ' Call count: ', callCount)
+        else:
+            print("PAUSE! Halting processing to avoid call limit overage")
+            print("Left off with character: ", character['characterId'])
+            sys.exit(0)
+        
+        characterNum = characterNum + 1
+        
+    print('Number of characters called: ', characterNum)
 
-#def read_creator_file(entity):
-    #FIX!
-    #build url based on file data
-    #with open('comics.json', 'r') as comicFile:
-        #fileData = json.load(comicFile)
+# def read_creator_file(entity):
+#     #FIX!!!
+#     #build url based on file data
+#     with open('characters.json', 'r') as characterFile:
+#         fileData = json.load(characterFile)
 
-        #for comic in fileData:
-            #comicId = comic['id']
+#         for character in fileData:
+#             charId = character['id']
 
-            #entity_url = comic['creators']['collectionURI']
-            #num_available = comic['creators']['available']
-            #print("Total creators for comic: ", num_available)
+#             entity_url = character['creators']['collectionURI']
+#             num_available = character['creators']['available']
+#             print("Total creators for character: ", num_available)
 
-#def retrieve_creators():
-    #FIX!
-    #global url_prefix, callCount, skipVal
+# def retrieve_creators():
+#     #FIX!!!
+#     global url_prefix, callCount, skipVal
 
-#def retrieve_series():
-    #global url_prefix, callCount, skipVal
-    #url_series_char = url_prefix + 'v1/public/characters/'
+# def retrieve_series():
+#     global url_prefix, callCount, skipVal
+#     url_series_char = url_prefix + 'v1/public/characters/'
 
-#def retrieve_stories():
-    #global url_prefix, callCount, skipVal
-    #url_stories_char = url_prefix + 'v1/public/characters/'
+# def retrieve_stories():
+#     global url_prefix, callCount, skipVal
+#     url_stories_char = url_prefix + 'v1/public/characters/'
 
-#def retrieve_events():
-    #global url_prefix, callCount, skipVal
-    #url_events_char = url_prefix + 'v1/public/characters/'
+# def retrieve_events():
+#     global url_prefix, callCount, skipVal
+#     url_events_char = url_prefix + 'v1/public/characters/'
 
 if __name__ == '__main__':
     globals()[sys.argv[1]]()
