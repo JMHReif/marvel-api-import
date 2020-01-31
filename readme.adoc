@@ -18,6 +18,7 @@ Users interested in following this process for themselves and pulling the data i
 
 1. Go to https://developer.marvel.com/[developer.marvel.com/^] and create an account.
 2. Under the main page header, you should see a white menu bar with `Developer Portal` and a list of links. Choose the `Get a Key` option. This option also shows up on the right side of another white menu bar beneath the central image.
+
 image::{img}marvel_dev_portal.png
 3. Fill out the request to receive an API key to access the data and interactive documentation.
 4. Once approved, start trying it out! Marvel has good interactive documentation that is very helpful to see what parameters and requests look like, as well as what data comes back and the result formatting.
@@ -32,11 +33,11 @@ Current existing entity counts from the API are listed here to help others plan 
 
 [opts=header]
 |===
-h|Entity       |   Count|
-|*Characters:* |   1493 |
-|*Comics:*     |  46410 |
-|*Creators:*   |   5304 |
-|*Events:*     |     75 |
-|*Series:*     |  11623 |
-|*Stories:*    | 107867 |
+h|Entity       |  Count
+|*Characters:* |   1493
+|*Comics:*     |  46410
+|*Creators:*   |   5304
+|*Events:*     |     75
+|*Series:*     |  11623
+|*Stories:*    | 107867
 |===
