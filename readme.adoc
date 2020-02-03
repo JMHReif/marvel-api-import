@@ -41,3 +41,21 @@ h|Entity       |  Count
 |*Series:*     |  11623
 |*Stories:*    | 107867
 |===
+
+== Executing the script
+
+I have set up the `import-neo4j-json.py` script in this repository to handle importing the data.
+There are functions to retrieve each entity type from the API and dump the data to separate json files.
+To get the data, you can call the script using `python3 import-neo4j-json.py <function_name>` and subsitute each retrieve_<entity> function at the end.
+
+`python3 import-neo4j-json.py retrieve_characters`
+`python3 import-neo4j-json.py retrieve_comics`
+
+You may notice that I use the characters.json or comics.json files as a base to call some of the other data.
+This is because I want to include the JOINs (or relationships) between the entities and because of the data limits in some of the API results.
+
+== Using the data
+
+As Marvel requests in its documentation and in granting an API key, please attribute the source of the data and give credit where credit is due.
+Hope you enjoy exploring this data as much as I have solving how to load it.
+Happy importing!
