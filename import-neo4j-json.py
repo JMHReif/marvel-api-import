@@ -1,5 +1,3 @@
-#"Data provided by Marvel. © 2020 MARVEL"
-
 # import dependency packages
 import sys
 import hashlib
@@ -66,7 +64,7 @@ def retrieve_characters():
             del element['stories']['returned']
             del element['events']['items']
             del element['events']['returned']
-            trimmedData['results'].append(element)
+            trimmedData['characters'].append(element)
 
         #increment skip value
         skipVal = skipVal + 100
@@ -84,7 +82,7 @@ def read_character_file(entity):
             "results": []
         }
 
-        for character in fileData['results']:
+        for character in fileData['characters']:
             charId = character['id']
             entity_url = character[entity]['collectionURI']
             num_available = character[entity]['available']
